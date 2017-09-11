@@ -910,7 +910,8 @@ var orderDetailTpl = {
 				this.$router.push({name:preferentialPay});
 			}
 			if(val == "3"){
-				this.$messagebox({
+				this.$router.push({name:"refunds"});
+				/*this.$messagebox({
 					title:"提示",
 					message:"确定要退款么？",
 					showCancelButton:true
@@ -922,7 +923,7 @@ var orderDetailTpl = {
 							duration: 500
 						});
 					}
-				});
+				});*/
 			}
 		}
 	}
@@ -1287,8 +1288,8 @@ var confirmOrderTpl ={
 				this.fufen = true;
 			}
 		},
-		submitL:function(){
-			this.$router.push({name:});
+		submit:function(){
+			this.$router.push({});
 		}
 	},
 	computed:{
