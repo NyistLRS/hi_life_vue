@@ -25,7 +25,8 @@ var router = new VueRouter({ // 路由要挂载在vue实例上
 		{path:"/myOrder/*",component:orderDetailTpl,name:"orderDetail"},
 		{path:"/classify",component:classifyTpl,name:"classify"},
 		{path:"/store",component:storeTpl,name:"store"},
-		{path:"/goodsDetail",component:goodsDetailTpl,name:"goodsDetail"}
+		{path:"/goodsDetail",component:goodsDetailTpl,name:"goodsDetail"},
+		{path:"/confirmOrder",component:confirmOrderTpl,name:"confirmOrder"}
 	]
 });
 new Vue({

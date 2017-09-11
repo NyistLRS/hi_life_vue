@@ -1088,7 +1088,7 @@ var goodsDetailTpl = {
 			+'</section>'
 			+'</div>'
 			+'</section>'
-			+'<footer><div class="addCart" @click="popGood">加入购物车</div><div class="goPay">立即购买</div></footer>'
+			+'<footer><div class="addCart" @click="popGood">加入购物车</div><div class="goPay" @click="pay">立即购买</div></footer>'
 			+'<mt-popup v-model="popupVisible" position="bottom" class="sp-list">'
 			+'<select-view @closePop="closePop"></select-view>'
 			+'</mt-popup>'
@@ -1114,6 +1114,9 @@ var goodsDetailTpl = {
 		},
 		closePop:function(val){
 			this.popupVisible = val;
+		},
+		pay:function(){
+			this.$router.push({name:"confirmOrder"});
 		}
 	},
 	mounted:function(){
@@ -1128,25 +1131,82 @@ var goodsDetailTpl = {
 var cartSelect = Vue.component('select-view',{
 	data(){
 		return {
-			size:1000
+			good:{},
+			material:"用料",
+			comboType:"套餐类型",
+			materialActive:"",
+			comboTypeActive:"",
+			size:0
 		}
 	},
 	template:'<div class="cart-add">'
 			+'<div class="cart-good-mes"><i class="cart-close" @click="close"></i>'
-			+'<div class="cart-good-img"><img src="./image/good-img.png"></div>'
-			+'<div class="cart-good-text"><div>¥18.98</div><div>库存{{size}}件</div><div>请选择  用料  套餐类型</div></div>'
-			+'<div class="cart-list"><div class="title">用料</div><div class="conetnt"><span>蜜汁叉烧</span><span>腊味叉烧</span></div></div>'
-			+'<div class="cart-list"><div class="title">套餐类型</div><div class="conetnt"><span class="selected">茶点套餐</span><span>茶点+粥品套餐</span></div></div>'
-			+'<div class="cart-list"><span>购买数量</span><div class="cart-size-oper"><i class="reset"></i><i class="shift"></i><i class="size">1</i><i class="push"></i></div></div>'
+			+'<div class="cart-good-img"><img :src="good.img"></div>'
+			+'<div class="cart-good-text"><div>¥{{good.price}}</div><div>库存{{good.sales}}件</div><div>请选择  {{material}}  {{comboType}}</div></div>'
+			+'<div class="cart-list"><div class="title">用料</div><div class="conetnt"><span v-for="(item,key) in good.material" :class="{selected:item==materialActive}" @click="materialFun(item)">{{item}}</span></div></div>'
+			+'<div class="cart-list"><div class="title">套餐类型</div><div class="conetnt"><span v-for="(item1,key1) in good.comboType" :class="{selected:item1==comboTypeActive}" @click="comboTypeFun(item1)">{{item1}}</span></div></div>'
+			+'<div class="cart-list"><span>购买数量</span><div class="cart-size-oper"><i class="reset" @click="reset"></i><i class="shift" :class="{no:size<=0}" @click="shift"></i><i class="size">{{size}}</i><i class="push" @click="push"></i></div></div>'
 			+'</div>'
 			+'<footer @click="ok">确定</footer>'
 			+'</div>',
 	methods:{
 		ok:function(){
+			if(this.materialActive == ""){
+				this.$toast({
+					message: '请选择用料',
+					duration: 1000
+				});
+				return;
+			}
+			if(this.comboTypeActive == ""){
+				this.$toast({message:"请选择套餐类型",duration: 1000});
+				return;
+			}
+			if(this.size <= 0){
+				this.$toast({message:"请选择你需要购买的数量!",duration: 1000});
+				return;
+			}
 			this.$emit("closePop",false);
 		},
 		close:function(){
 			this.$emit("closePop",false);
+		},
+		materialFun:function(val){
+			this.materialActive = val;
+		},
+		comboTypeFun:function(val){
+			this.comboTypeActive = val;
+		},
+		reset:function(){
+			this.size = 0;
+		},
+		shift:function(){
+			if(this.size > 0){
+				this.size--;
+			}
+		},
+		push:function(){
+			this.size++;
 		}
+	},
+	created:function(){
+		var _this = this;
+		axios.get(serverUrl+'/good.json')
+		.then(function(response){
+			_this.good = response.data;
+		})
+		.catch(function(){
+			_this.$toast("加载失败");
+		});
 	}
 })
+/* 提交订单页面 */
+var confirmOrderTpl ={
+	data(){
+		return {
+			title:"提交订单",
+			routerName:""
+		}
+	},
+	template:'<div><header-view :title="title" :routerName="routerName" ></header-view></div>'
+}

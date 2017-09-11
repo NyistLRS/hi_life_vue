@@ -1910,6 +1910,7 @@ small{
 .cart-list .conetnt span{
 	font-size: .12rem;
 	color: #333;
+	margin-right: .05rem;
 	padding: .05rem .13rem;
 	border-radius: .3rem;
 	background-color: #F5F5F5;
@@ -1948,4 +1949,14 @@ small{
 	line-height: .3rem;
 	margin: 0 .02rem;
 	background-color: #F5F5F5;
+}
+.cart-size-oper i.shift.no{
+	background:url(../image/cart/add_cart_number_cut_dis@3x.png) ;
+	background-size: 100% 100%;
+}
+.goods-detail .v-modal{
+	z-index: 99!important;
+}
+.goods-detail .mint-popup{
+	z-index: 100!important;
 }

@@ -1,0 +1,7 @@
+{
+	"img":"./image/good-img.png",
+	"price":18.98,
+	"sales":1000,
+	"material":["蜜汁叉烧","腊味叉烧"],
+	"comboType":["茶点套餐","茶点+粥品套餐"]
+}
