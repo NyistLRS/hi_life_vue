@@ -1057,7 +1057,8 @@ var goodsDetailTpl = {
 			top:0,
 			isTop:false,
 			isfixed:false,
-			popupVisible:true
+			popupVisible:false,
+			type:0
 		}
 	},
 	template:'<div class="goods-detail">'
@@ -1088,9 +1089,9 @@ var goodsDetailTpl = {
 			+'</section>'
 			+'</div>'
 			+'</section>'
-			+'<footer><div class="addCart" @click="popGood">加入购物车</div><div class="goPay" @click="pay">立即购买</div></footer>'
+			+'<footer><div class="addCart" @click="pay(0)">加入购物车</div><div class="goPay" @click="pay(1)">立即购买</div></footer>'
 			+'<mt-popup v-model="popupVisible" position="bottom" class="sp-list">'
-			+'<select-view @closePop="closePop"></select-view>'
+			+'<select-view @closePop="closePop" :oper="type"></select-view>'
 			+'</mt-popup>'
 			+'</div>',
 	methods:{
@@ -1109,14 +1110,12 @@ var goodsDetailTpl = {
 				this.isfixed = false;
 			}
 		},
-		popGood:function(){
-			this.popupVisible = true;
-		},
 		closePop:function(val){
 			this.popupVisible = val;
 		},
-		pay:function(){
-			this.$router.push({name:"confirmOrder"});
+		pay:function(val){
+			this.popupVisible = true;
+			this.type = val;
 		}
 	},
 	mounted:function(){
@@ -1129,6 +1128,7 @@ var goodsDetailTpl = {
 }
 /* 页面购物车信息 */
 var cartSelect = Vue.component('select-view',{
+	props:['oper'],
 	data(){
 		return {
 			good:{},
@@ -1145,12 +1145,13 @@ var cartSelect = Vue.component('select-view',{
 			+'<div class="cart-good-text"><div>¥{{good.price}}</div><div>库存{{good.sales}}件</div><div>请选择  {{material}}  {{comboType}}</div></div>'
 			+'<div class="cart-list"><div class="title">用料</div><div class="conetnt"><span v-for="(item,key) in good.material" :class="{selected:item==materialActive}" @click="materialFun(item)">{{item}}</span></div></div>'
 			+'<div class="cart-list"><div class="title">套餐类型</div><div class="conetnt"><span v-for="(item1,key1) in good.comboType" :class="{selected:item1==comboTypeActive}" @click="comboTypeFun(item1)">{{item1}}</span></div></div>'
-			+'<div class="cart-list"><span>购买数量</span><div class="cart-size-oper"><i class="reset" @click="reset"></i><i class="shift" :class="{no:size<=0}" @click="shift"></i><i class="size">{{size}}</i><i class="push" @click="push"></i></div></div>'
+			+'<div class="cart-list"><span>购买数量</span><div class="cart-size-oper"><i class="shift" :class="{no:size<=0}" @click="shift"></i><i class="size">{{size}}</i><i class="push" @click="push"></i></div></div>'
 			+'</div>'
 			+'<footer @click="ok">确定</footer>'
 			+'</div>',
 	methods:{
 		ok:function(){
+			var spObj = {};
 			if(this.materialActive == ""){
 				this.$toast({
 					message: '请选择用料',
@@ -1166,7 +1167,22 @@ var cartSelect = Vue.component('select-view',{
 				this.$toast({message:"请选择你需要购买的数量!",duration: 1000});
 				return;
 			}
+			if(this.oper == 1){
+				spObj.goodId = this.good.goodId;
+				spObj.config = [];
+				spObj.config.push({label:"用料",active:this.materialActive});
+				spObj.config.push({label:"套餐类型",active:this.comboTypeActive});
+				spObj.size = this.size;
+				this.$router.push({name:"confirmOrder",params:spObj});
+			}
 			this.$emit("closePop",false);
+			if(this.oper == 0){
+				/* 请求后台*/
+				this.materialActive = "";
+				this.comboTypeActive = "";
+				this.size = 0;
+				this.$toast({message:"恭喜您，成功加入购物车!",duration:1000});
+			}
 		},
 		close:function(){
 			this.$emit("closePop",false);
@@ -1176,9 +1192,6 @@ var cartSelect = Vue.component('select-view',{
 		},
 		comboTypeFun:function(val){
 			this.comboTypeActive = val;
-		},
-		reset:function(){
-			this.size = 0;
 		},
 		shift:function(){
 			if(this.size > 0){
@@ -1198,6 +1211,13 @@ var cartSelect = Vue.component('select-view',{
 		.catch(function(){
 			_this.$toast("加载失败");
 		});
+	},
+	watch:{
+		oper:function(){
+			this.materialActive = "";
+			this.comboTypeActive = "";
+			this.size = 0;
+		}
 	}
 })
 /* 提交订单页面 */
@@ -1205,8 +1225,82 @@ var confirmOrderTpl ={
 	data(){
 		return {
 			title:"提交订单",
-			routerName:""
+			routerName:"",
+			spList:{},
+			isfixed:false,
+			spConfig:{},
+			pick:"",
+			fufen:false,
+			fuFen:"",
+			shiftMoney:0
 		}
 	},
-	template:'<div><header-view :title="title" :routerName="routerName" ></header-view></div>'
+	template:'<div class="confirm-order"><header-view :fixed="isfixed" :title="title" :routerName="routerName" ></header-view>'
+			+'<section class="confirm-sp-detail">'
+			+'<div class="hi-life-list-item">'
+			+'<div class="hi-life-list-item-img"><img :src="spList.img"></div>'
+			+'<div class="hi-life-list-item-content">'
+			+'<div class="hi-life-list-item-summary">{{spList.summary}}</div>'
+			+'<div class="hi-life-list-item-summary"><span v-for="(item,key) in spConfig.config">{{item.label}}:{{item.active}}</span></div>'
+			+'<div class="hilife-list-detail"><span class="sp-sales">¥{{spList.price}}</span><span class="sp-count">x{{spConfig.size}}</span></div>'
+			+'</div>'
+			+'</div>'
+			+'<div class="confirm-list"><i @click="checkbox(\'到店自提\')" class="checkbox" :class="{\'checkbox-selected\':pick == \'到店自提\'}"></i>到店自提<span class="right-help">暂未提供送货服务</span></div>'
+			+'<div class="confirm-list"><div class="right">共{{spConfig.size}}件商品  小计:<span class="yellow">¥{{spConfig.size*spList.price}}</span></div></div>'
+			+'</section>'
+			+'<section class="fufen-oper">'
+			+'<div class="confirm-list"><i @click="checkboxFufen" class="checkbox" :class="{\'checkbox-selected\':fufen}"></i>使用福分<small>(100福分可抵扣1元)</small><span class="right-help">可用福分:<span class="yellow">100</span>个</span></div>'
+			+'<div class="confirm-list" v-if="fufen">抵扣福分<div class="right fufen-shift"><input type="number" v-model="fuFen" placeholder="请填写使用个数"></div></div>'
+			+'</section>'
+			+'<footer><span v-if="fufen">抵扣福分¥</span><span v-if="fufen">{{shiftMoney}}</span>'
+			+'<div class="confirm-bottom-right"><div class="confirm-bottom-right-mes"><span style="color:#333;">合计:</span><span class="yellow">¥{{count}}</span></div>'
+			+'<div class="confirm-bottom-right-btn" @click="submit">提交订单</div></div></footer>'
+			+'</div>',
+	created:function(){
+		var _this = this;
+		if(this.$route.params.goodId){
+			this.spConfig = this.$route.params;
+			sessionStorage.setItem("spConfig",JSON.stringify(this.$route.params));
+		}else{
+			this.spConfig = JSON.parse(sessionStorage.spConfig);
+		}
+		axios.get(serverUrl+"/confirmOrder.json")
+		.then(function(response){
+			_this.spList = response.data;
+		})
+		.catch(function(){
+			_this.$toast("加载失败");
+		});
+	},
+	methods:{
+		checkbox:function(val){
+			if(this.pick == ""){
+				this.pick = val;
+			}else{
+				this.pick = "";
+			}
+		},
+		checkboxFufen:function(){
+			if(this.fufen){
+				this.fufen = false;
+			}else{
+				this.fufen = true;
+			}
+		},
+		submitL:function(){
+			this.$router.push({name:});
+		}
+	},
+	computed:{
+		count:function(){
+			var shiftMoney = this.fuFen/100;
+			if(shiftMoney>=1){
+				this.shiftMoney = shiftMoney;
+				return this.spConfig.size*this.spList.price - this.shiftMoney;
+			}else{
+				this.shiftMoney = 0;
+				return this.spConfig.size*this.spList.price;
+			}
+		}
+	}
 }

@@ -923,7 +923,7 @@ hr {
 	flex-shrink: 0;
 	width: .28rem;
 	position: relative;
-	border-bottom: .01rem solid lightgray;
+	border-bottom: .01rem solid #E5E5E5;
 }
 
 .hi-life-list-checkbox i {
@@ -936,7 +936,7 @@ hr {
 	width: .2rem;
 	height: .2rem;
 	border-radius: 50%;
-	border: .01rem solid lightgray;
+	border: .01rem solid #E5E5E5;
 }
 
 .hi-life-list-checkbox i.icon-selected {
@@ -949,7 +949,7 @@ hr {
 	flex-shrink: 0;
 	width: .9rem;
 	padding: .15rem 0;
-	border-bottom: .01rem solid lightgray;
+	border-bottom: .01rem solid #E5E5E5;
 }
 .hi-life-list-item-img img{
 	height: .9rem;
@@ -959,7 +959,7 @@ hr {
 	flex: auto;
 	position: relative;
 	padding: .15rem .1rem;
-	border-bottom: .01rem solid lightgray;
+	border-bottom: .01rem solid #E5E5E5;
 }
 
 .hi-life-list-item-content h3 {
@@ -1959,4 +1959,96 @@ small{
 }
 .goods-detail .mint-popup{
 	z-index: 100!important;
+}
+/* 提交订单页面 */
+.confirm-order{
+	height: 100%;
+	background-color: #F5F5F5;
+}
+.confirm-sp-detail,.fufen-oper{
+	padding-left: .1rem;
+	margin-bottom: .05rem;
+	background-color: #FFFFFF;
+}
+.confirm-order .sp-sales{
+	color: rgb(255, 161, 38);
+}
+.confirm-order .hi-life-list-item-summary:first-child{
+	color: #333;
+}
+.confirm-order .hi-life-list-item-summary span{
+	margin-left: .05rem;
+}
+.confirm-list{
+	clear: both;
+	height: .45rem;
+	line-height: .45rem;
+	color: #333;
+	padding-right: .15rem;
+    border-bottom: .01rem solid #E5E5E5;
+}
+.confirm-sp-detail .confirm-list:last-child,.fufen-oper .confirm-list:last-child{
+	border-bottom: none;
+}
+.confirm-order>footer{
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	height: .45rem;
+	padding-left: .15rem;
+	line-height: .45rem;
+	 border-top: .01rem solid #E5E5E5;
+	background-color: #FFFFFF;
+}
+.confirm-bottom-right{
+	float: right;
+	width: 2.1rem;
+	height: 100%;
+}
+.confirm-bottom-right-mes{
+	display: inline-block;
+	vertical-align: top;
+	text-align: center;
+	width: 50%;
+	height: 100%;
+}
+.confirm-bottom-right-btn{
+	display: inline-block;
+	vertical-align: top;
+	text-align: center;
+	height: 100%;
+	width: 50%;
+	color: #FFFFFF;
+    background: -webkit-linear-gradient(left, rgb(255, 161, 38), rgb(255, 109, 24));
+    background: linear-gradient(to right, rgb(255, 161, 38), rgb(255, 109, 24));
+}
+.checkbox{
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: .1rem;
+	width: .2rem;
+	height: .2rem;
+	background: url(../image/order_dis_select@3x.png);
+	background-size: 100% 100%;
+}
+.checkbox-selected{
+	background: url(../image/shopping_cart_list_select@3x.png);
+	background-size: 100% 100%;
+}
+.right-help{
+	float: right;
+	font-size: .12rem;
+	color: #999999;
+}
+.right{
+	float: right;
+	font-size: .12rem;
+}
+.yellow{
+	color: rgb(255, 161, 38);
+}
+.fufen-shift input{
+	width: 1rem;
+	height: 100%;
+	text-align: right;
 }
